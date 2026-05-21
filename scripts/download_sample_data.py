@@ -14,6 +14,7 @@ import pandas as pd
 
 from src.ingestion.yahoo_client import fetch_ohlcv
 from src.config.settings import RAW_DATA_DIR
+from src.utils.data_validation import validate_ohlcv_data
 
 OUTPUT_FILE: Final[Path] = RAW_DATA_DIR / "aapl_daily.parquet"
 
@@ -44,6 +45,9 @@ def main() -> None:
     # Basic validation
     if df is None or df.empty:
         raise RuntimeError("no data fetched for AAPL in the requested range")
+
+    # Validate structural integrity of OHLCV data
+    validate_ohlcv_data(df)
 
     row_count = len(df)
     save_df_to_parquet(df, OUTPUT_FILE)
